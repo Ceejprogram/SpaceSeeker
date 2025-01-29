@@ -6,7 +6,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +24,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.spaceseeker.R
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -91,8 +88,7 @@ fun SpaceInvadersGame() {
     var gameStarted by remember { mutableStateOf(false) } // New state variable
 
     // Load images
-    val startGameBitmap =
-        ImageBitmap.imageResource(id = R.drawable.game_start) // Load as ImageBitmap
+    val startGameBitmap = ImageBitmap.imageResource(id = R.drawable.game_start) // Load as ImageBitmap
     val spaceshipBitmap = ImageBitmap.imageResource(id = R.drawable.spaceship)
     val invader1Bitmap = ImageBitmap.imageResource(id = R.drawable.invader1)
     val invader2Bitmap = ImageBitmap.imageResource(id = R.drawable.invader2)
@@ -100,8 +96,10 @@ fun SpaceInvadersGame() {
     val playerBulletBitmap = ImageBitmap.imageResource(id = R.drawable.missle1)
     val enemyBulletBitmap = ImageBitmap.imageResource(id = R.drawable.evilmissle1)
     val livesBitmap = ImageBitmap.imageResource(id = R.drawable.crafts) // Load the crafts image
-    val backgroundBitmap =
-        ImageBitmap.imageResource(id = R.drawable.space_background) // Load the background image
+    val backgroundBitmap = ImageBitmap.imageResource(id = R.drawable.space_background) // Load the background image
+    val victoryBitmap = ImageBitmap.imageResource(id = R.drawable.victory) // Load victory image
+    val defeatBitmap = ImageBitmap.imageResource(id = R.drawable.defeat) // Load defeat image
+    val playAgainBitmap = ImageBitmap.imageResource(id = R.drawable.play_again)
 
     // Background position
     var backgroundY by remember { mutableStateOf(0f) }
@@ -327,7 +325,6 @@ fun SpaceInvadersGame() {
                             currentStage++
                             enemyDirection = 1f
                             enemies = createStage(currentStage)
-                            bullets = emptyList()
                         }
                     }
 
@@ -468,6 +465,28 @@ fun SpaceInvadersGame() {
                     )
                 )
             }
+
+            // Display victory image if the game is won
+            if (victory) {
+                drawImage(
+                    victoryBitmap,
+                    topLeft = Offset(
+                        (screenWidth - victoryBitmap.width) / 2,
+                        (screenHeight - victoryBitmap.height) / 2
+                    )
+                )
+            }
+
+            // Display defeat image if the game is over
+            if (gameOver) {
+                drawImage(
+                    defeatBitmap,
+                    topLeft = Offset(
+                        (screenWidth - defeatBitmap.width) / 2,
+                        (screenHeight - defeatBitmap.height) / 2
+                    )
+                )
+            }
         }
 
         // Handle spaceship movement and shooting
@@ -482,40 +501,43 @@ fun SpaceInvadersGame() {
                     )
                 }
             }
-
-
         }
 
-        Column(Modifier.padding(16.dp)) {
-            Text("WAVE $currentStage", fontSize = 20.sp, color = Color.Red) // Smaller stage text
-            if (gameOver) Text("GAME OVER!", fontSize = 32.sp, color = Color.Red)
-            if (victory) Text("Successfully Defended!", fontSize = 32.sp, color = Color.Green)
-        }
 
         if (gameOver || victory) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .pointerInput(Unit) { }  // Ensure touch priority
-            ) {
-                Button(
-                    onClick = {
-                        // Full game reset
-                        player = Player(Offset.Zero)
-                        bullets = emptyList()
-                        enemyBullets = emptyList() // Reset enemy bullets
-                        score = 0
-                        lives = 3 // Reset lives
-                        gameOver = false
-                        victory = false
-                        currentStage = 1
-                        enemyDirection = 1f
-                        enemyVerticalSpeed = 0f
-                        // Force recreation of enemies
-                        enemies = createStage(1)
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures {
+                            // Full game reset
+                            player = Player(Offset.Zero)
+                            bullets = emptyList()
+                            enemyBullets = emptyList() // Reset enemy bullets
+                            score = 0
+                            lives = 3 // Reset lives
+                            gameOver = false
+                            victory = false
+                            currentStage = 1
+                            enemyDirection = 1f
+                            enemyVerticalSpeed = 0f
+                            // Force recreation of enemies
+                            enemies = createStage(1)
+                        }
                     }
-                ) {
-                    Text("Restart Game")
+            ) {
+                // Position the play again image just below the center
+                val playAgainPosition = Offset(
+                    (screenWidth - playAgainBitmap.width) / 2,
+                    (screenHeight * 3 / 4) - (playAgainBitmap.height / 2) // Adjust Y position to 3/4 of the screen
+                )
+
+                // Draw the play again image
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    drawImage(
+                        image = playAgainBitmap,
+                        topLeft = playAgainPosition
+                    )
                 }
             }
         }
