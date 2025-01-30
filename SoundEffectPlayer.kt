@@ -1,13 +1,16 @@
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.MediaPlayer
 import android.media.SoundPool
 import com.example.spaceseeker.R
 
 object SoundEffectPlayer {
+    private var explosionSound: MediaPlayer? = null
     private var soundPool: SoundPool? = null
     private var shootSoundId: Int = 0
 
     fun loadSounds(context: Context) {
+        explosionSound = MediaPlayer.create(context, R.raw.explosion)
         val audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_GAME)
             .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
@@ -26,8 +29,14 @@ object SoundEffectPlayer {
         soundPool?.play(shootSoundId, 1f, 1f, 1, 0, 1f)
     }
 
+    fun playExplosionSound() {
+        explosionSound?.start()
+    }
+
     fun release() {
         soundPool?.release()
         soundPool = null
+        explosionSound?.release()
+        explosionSound = null
     }
 }

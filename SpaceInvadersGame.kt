@@ -287,6 +287,11 @@ fun SpaceInvadersGame() {
                                 currentEnemy = currentEnemy.copy(health = currentEnemy.health - 1)
                                 score += 10
                                 hitBullets.add(bullet)
+
+                                // Play explosion sound when enemy is destroyed
+                                if (currentEnemy.health <= 0) {
+                                    SoundEffectPlayer.playExplosionSound() // Play explosion sound here
+                                }
                             }
                         }
                         currentEnemy
@@ -310,6 +315,8 @@ fun SpaceInvadersGame() {
 
                         if (lives <= 0) {
                             gameOver = true // Set game over if no lives left
+                            // Play explosion sound when player is hit
+                            SoundEffectPlayer.playExplosionSound() // Play explosion sound here
                         }
                     }
 
